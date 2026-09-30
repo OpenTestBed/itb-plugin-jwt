@@ -1,0 +1,38 @@
+apiVersion: itb-plugins/v1
+name: jwt
+version: 0.1.0
+description: >
+  JSON Web Token vocabulary for the OTB Gherkin language: decode a compact JWS
+  and assert on its claims. Needed by any profile that carries authorization in
+  a bearer token — IHE IUA, SMART on FHIR, UDAP.
+homepage: https://github.com/OpenTestBed/itb-plugin-jwt
+license: BSD-3-Clause
+maintainers: [jose.a.teixeira@gmail.com]
+
+# DIALECT ONLY — this plugin deploys nothing.
+#
+# Decoding is base64url plus a JSON parse, which GITB TDL cannot do on its own:
+# there is no base64 processor. Rather than stand up a service for it, these
+# verbs borrow the FHIR validator's FHIRPath endpoint, whose implementation
+# supports split() and decode('urlbase64'). Verified against validator_cli
+# server on the R5 model:
+#
+#   'a.b.c'.split('.')[1]                     -> b
+#   '<jws>'.split('.')[1].decode('urlbase64') -> the claims as JSON
+#
+# Neither function appears in the FHIRPath N1 specification nor in FHIR R5's
+# list of added functions, so this rests on the implementation rather than on
+# the spec. If a future validator drops them, these verbs break and the fix is
+# a real service.
+runtime: {}
+endpoints: {}
+provides: []
+
+requires:
+  - { capability: fhirpath-eval, uri: https://opentestbed.github.io/itb-plugins/capabilities/fhirpath-eval, version: 1.0.0 }
+
+dialect:
+  path: dialect/
+  namespace: jwt
+
+config: {}
